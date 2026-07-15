@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Your Adventure | Roamify</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* --- Google Fonts & Reset --- */
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+            text-decoration: none;
+            list-style: none;
+            scroll-behavior: smooth;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        :root {
+            --primary: #ff4a5a;
+            --dark: #3a393a;
+            --light: #fdfdfd;
+            --bg-alt: #f4f6f9;
+            --grey: #6c757d;
+            --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        body {
+            background-color: var(--bg-alt);
+            color: var(--dark);
+            overflow-x: hidden;
+        }
+
+        /* --- Header / Navbar --- */
+        header {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            padding: 15px 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 30px rgba(0,0,0,0.03);
+            z-index: 1000;
+        }
+
+        header .logo {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--dark);
+            letter-spacing: -0.5px;
+        }
+
+        header .logo .dot {
+            color: var(--primary);
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: var(--dark);
+            font-weight: 600;
+            margin-left: 25px;
+            font-size: 0.95rem;
+            position: relative;
+            padding: 5px 0;
+            transition: var(--transition);
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: 0; left: 0;
+            width: 0; height: 2px;
+            background: var(--primary);
+            transition: var(--transition);
+        }
+
+        .nav-links a:hover::after, .nav-links a.active::after {
+            width: 100%;
+        }
+
+        .nav-links a:hover, .nav-links a.active {
+            color: var(--primary);
+        }
+
+        .menu-toggle {
+            font-size: 22px;
+            cursor: pointer;
+            display: none;
+            z-index: 1100;
+            width: 40px;
+            height: 40px;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: var(--bg-alt);
+            transition: var(--transition);
+        }
+
+        /* --- Booking Hero --- */
+        .book-hero {
+            height: 38vh;
+            background: linear-gradient(rgba(0,0,0,0.65), rgba(0,0,0,0.65)), 
+                        url('https://images.unsplash.com/photo-1506012787146-f92b2d7d6d96?auto=format&fit=crop&w=1500&q=80') no-repeat center center/cover;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            color: #fff;
+            padding: 80px 24px 0;
+        }
+
+        .book-hero h1 {
+            font-size: 2.8rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            letter-spacing: -1px;
+        }
+
+        .book-hero p {
+            font-size: 1.1rem;
+            font-weight: 300;
+            opacity: 0.9;
+        }
+
+        /* --- Layout Container --- */
+        .booking-page-container {
+            max-width: 1200px;
+            margin: -50px auto 80px;
+            padding: 0 20px;
+            display: grid;
+            grid-template-columns: 1.4fr 1fr;
+            gap: 30px;
+            position: relative;
+            z-index: 10;
+        }
+
+        /* --- Interactive Form Styling --- */
+        .form-section-card {
+            background: #fff;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.04);
+            border: 1px solid #eef1f6;
+        }
+
+        .form-section-card h2 {
+            font-size: 1.6rem;
+            margin-bottom: 25px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .form-section-card h2 i {
+            color: var(--primary);
+        }
+
+        .form-step-title {
+            font-size: 1.05rem;
+            font-weight: 600;
+            margin: 25px 0 15px;
+            padding-bottom: 8px;
+            border-bottom: 1.5px dashed #eee;
+            color: var(--dark);
+        }
+
+        .booking-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .booking-span-2 {
+            grid-column: span 2;
+        }
+
+        .field-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .field-group label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--grey);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .field-group input, .field-group select {
+            padding: 14px 16px;
+            border: 1.5px solid #eee;
+            background: #fafafa;
+            border-radius: 8px;
+            outline: none;
+            font-size: 0.95rem;
+            color: var(--dark);
+            transition: var(--transition);
+        }
+
+        .field-group input:focus, .field-group select:focus {
+            border-color: var(--primary);
+            background: #fff;
+            box-shadow: 0 0 0 4px rgba(255, 74, 90, 0.1);
+        }
+
+        /* --- Upgrade Options Grid --- */
+        .upgrades-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 5px;
+        }
+
+        .upgrade-card {
+            background: #fafafa;
+            border: 1.5px solid #eee;
+            border-radius: 12px;
+            padding: 16px;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .upgrade-card:hover {
+            border-color: #dcdcdc;
+            background: #f7f7f7;
+        }
+
+        .upgrade-card input[type="checkbox"] {
+            margin-top: 4px;
+            accent-color: var(--primary);
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .upgrade-text h4 {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 4px;
+        }
+
+        .upgrade-text p {
+            font-size: 0.8rem;
+            color: var(--grey);
+            line-height: 1.4;
+        }
+
+        /* Upgrade checked state via CSS trigger helper */
+        .upgrade-card.selected {
+            border-color: var(--primary);
+            background: rgba(255, 74, 90, 0.03);
+        }
+
+        /* --- Booking Summary Card (Sticky) --- */
+        .summary-sticky-card {
+            position: sticky;
+            top: 100px;
+            background: var(--dark);
+            color: #fff;
+            border-radius: 20px;
+            padding: 35px 30px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .summary-sticky-card h3 {
+            font-size: 1.4rem;
+            font-weight: 600;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.9rem;
+            margin-bottom: 14px;
+            color: rgba(255,255,255,0.7);
+        }
+
+        .summary-row.bold-highlight {
+            font-size: 1.05rem;
+            color: #fff;
+            font-weight: 600;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            padding-top: 15px;
+            margin-top: 15px;
+        }
+
+        .summary-total {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 2px dashed rgba(255,255,255,0.15);
+            padding-top: 20px;
+            margin-top: 20px;
+        }
+
+        .summary-total span {
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+
+        .total-price {
+            font-size: 1.9rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .submit-booking-btn {
+            width: 100%;
+            padding: 16px;
+            background: var(--primary);
+            border: none;
+            border-radius: 30px;
+            color: #fff;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(255, 74, 90, 0.3);
+            margin-top: 25px;
+            transition: var(--transition);
+        }
+
+        .submit-booking-btn:hover {
+            background: #e03d4c;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(255, 74, 90, 0.4);
+        }
+
+        .reassurance-list {
+            margin-top: 25px;
+            font-size: 0.8rem;
+            color: rgba(255,255,255,0.5);
+            line-height: 1.5;
+        }
+
+        .reassurance-list li {
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .reassurance-list li i {
+            color: #26de81;
+        }
+
+        /* --- Footer --- */
+        footer {
+            background: var(--dark);
+            color: rgba(255,255,255,0.7);
+            text-align: center;
+            padding: 30px 20px;
+            font-size: 0.85rem;
+            border-top: 1px solid #2a2a2a;
+        }
+
+        /* --- Responsive Drawer Backdrop --- */
+        .nav-backdrop {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.4);
+            opacity: 0;
+            visibility: hidden;
+            z-index: 998;
+            transition: var(--transition);
+        }
+
+        .nav-backdrop.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* --- Responsive Adjustments --- */
+        @media (max-width: 991px) {
+            .booking-page-container {
+                grid-template-columns: 1fr;
+            }
+            .summary-sticky-card {
+                position: relative;
+                top: 0;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .menu-toggle {
+                display: flex;
+            }
+
+            .nav-links {
+                position: fixed;
+                top: 0; 
+                right: -100%;
+                width: 280px;
+                height: 100vh;
+                background: #fff;
+                flex-direction: column;
+                align-items: flex-start;
+                padding: 100px 40px;
+                box-shadow: -10px 0 30px rgba(0,0,0,0.05);
+                z-index: 999;
+                transition: right 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+            }
+
+            .nav-links.active {
+                right: 0;
+            }
+
+            .nav-links li {
+                width: 100%;
+                margin-bottom: 25px;
+            }
+
+            .nav-links a {
+                margin-left: 0;
+                font-size: 1.15rem;
+                display: block;
+                width: 100%;
+            }
+
+            .book-hero h1 {
+                font-size: 2.2rem;
+            }
+
+            .booking-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .booking-span-2 {
+                grid-column: span 1;
+            }
+
+            .upgrades-container {
+                grid-template-columns: 1fr;
+            }
+
+            .form-section-card {
+                padding: 25px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+    <div class="logo">Roamify<span class="dot">.</span></div>
+    <nav>
+        <ul class="nav-links">
+            <li><a href="index.html#home">Home</a></li>
+            <li><a href="destination.html">Destinations</a></li>
+            <li><a href="book.html" class="active">Book Trip</a></li>
+            <!-- <li><a href="index.html#reviews">Reviews</a></li> -->
+            <li><a href="contact.html">Contact</a></li>
+        </ul>
+    </nav>
+    <div class="menu-toggle"><i class="fa-solid fa-bars"></i></div>
+</header>
+
+    <div class="nav-backdrop"></div>
+
+    <section class="book-hero">
+        <h1>Book Your Adventure</h1>
+        <p>Complete your layout preferences below to estimate your rate and reserve your slot.</p>
+    </section>
+
+    <!-- Booking Content Grid -->
+    <main class="booking-page-container">
+        
+        <!-- Booking Entry Form Card -->
+        <section class="form-section-card">
+            <form id="detailed-booking-form">
+                
+                <h2><i class="fa-solid fa-plane-departure"></i> Tour Reservation Details</h2>
+                
+                <p class="form-step-title">1. Trip Coordinates</p>
+                <div class="booking-grid">
+                    <div class="field-group booking-span-2">
+                        <label for="dest-select">Select Destination</label>
+                        <select id="dest-select" required>
+                            <option value="none" disabled selected>Choose a destination package...</option>
+                            <option value="850" data-name="Bali, Indonesia">Bali, Indonesia ($850 / person)</option>
+                            <option value="1200" data-name="Maldives">Maldives ($1,200 / person)</option>
+                            <option value="1400" data-name="Amalfi Coast, Italy">Amalfi Coast, Italy ($1,400 / person)</option>
+                            <option value="1500" data-name="Kyoto, Japan">Kyoto, Japan ($1,500 / person)</option>
+                            <option value="1800" data-name="Santorini, Greece">Santorini, Greece ($1,800 / person)</option>
+                            <option value="2200" data-name="Serengeti, Tanzania">Serengeti, Tanzania ($2,200 / person)</option>
+                        </select>
+                    </div>
+                    <div class="field-group">
+                        <label for="arrival-date">Arrival Date</label>
+                        <input type="date" id="arrival-date" required>
+                    </div>
+                    <div class="field-group">
+                        <label for="leaving-date">Leaving Date</label>
+                        <input type="date" id="leaving-date" required>
+                    </div>
+                    <div class="field-group booking-span-2">
+                        <label for="guest-count">Number of Guests</label>
+                        <input type="number" id="guest-count" min="1" max="12" value="1" required>
+                    </div>
+                </div>
+
+                <p class="form-step-title">2. Upgrades & Extras (Optional)</p>
+                <div class="upgrades-container">
+                    
+                    <label class="upgrade-card" id="card-upgrade-hotel">
+                        <input type="checkbox" id="upgrade-hotel" value="250">
+                        <div class="upgrade-text">
+                            <h4>Luxury Lodging</h4>
+                            <p>Upgrade to verified 5-star ocean-view resort properties (+$250 / guest).</p>
+                        </div>
+                    </label>
+
+                    <label class="upgrade-card" id="card-upgrade-guide">
+                        <input type="checkbox" id="upgrade-guide" value="150">
+                        <div class="upgrade-text">
+                            <h4>Private Local Guide</h4>
+                            <p>Enjoy designated priority history tours and dedicated expert guides (+$150 flat).</p>
+                        </div>
+                    </label>
+
+                    <label class="upgrade-card" id="card-upgrade-meals">
+                        <input type="checkbox" id="upgrade-meals" value="180">
+                        <div class="upgrade-text">
+                            <h4>All-Inclusive Diners</h4>
+                            <p>All lunches, premium reservation dinners, and drinks included (+$180 / guest).</p>
+                        </div>
+                    </label>
+
+                    <label class="upgrade-card" id="card-upgrade-insurance">
+                        <input type="checkbox" id="upgrade-insurance" value="80">
+                        <div class="upgrade-text">
+                            <h4>Full Care Insurance</h4>
+                            <p>No-fault medical events and luxury luggage protection cover (+$80 flat).</p>
+                        </div>
+                    </label>
+
+                </div>
+
+                <p class="form-step-title">3. Primary Contact</p>
+                <div class="booking-grid">
+                    <div class="field-group">
+                        <label for="lead-name">First & Last Name</label>
+                        <input type="text" id="lead-name" placeholder="John Doe" required>
+                    </div>
+                    <div class="field-group">
+                        <label for="lead-email">Email Address</label>
+                        <input type="email" id="lead-email" placeholder="john@example.com" required>
+                    </div>
+                </div>
+
+            </form>
+        </section>
+
+        <!-- Dynamic Invoice/Booking Summary Card -->
+        <aside class="summary-sticky-card">
+            <div>
+                <h3>Booking Invoice Summary</h3>
+                
+                <div class="summary-row">
+                    <span>Destination Selected:</span>
+                    <span id="summary-dest-name">None Selected</span>
+                </div>
+                
+                <div class="summary-row">
+                    <span>Rate (per individual):</span>
+                    <span id="summary-dest-base">$0</span>
+                </div>
+
+                <div class="summary-row">
+                    <span>Total Guests:</span>
+                    <span id="summary-guests">1 Traveler</span>
+                </div>
+
+                <div class="summary-row bold-highlight" id="summary-extras-row" style="display: none;">
+                    <span>Additional Extras Added:</span>
+                    <span id="summary-extras-total">$0</span>
+                </div>
+
+                <div class="summary-total">
+                    <span>Estimated Cost:</span>
+                    <span class="total-price" id="estimated-grand-total">$0</span>
+                </div>
+            </div>
+
+            <div>
+                <button type="submit" form="detailed-booking-form" class="submit-booking-btn">Proceed to Payment</button>
+                
+                <ul class="reassurance-list">
+                    <li><i class="fa-solid fa-circle-check"></i> 100% Risk-Free Secure Checkout</li>
+                    <li><i class="fa-solid fa-circle-check"></i> Free Cancellation within 14 Days</li>
+                    <li><i class="fa-solid fa-circle-check"></i> 24/7 Premium Customer Concierge Support</li>
+                </ul>
+            </div>
+        </aside>
+
+    </main>
+
+    <footer>
+        <p>&copy; 2026 Roamify. All Rights Reserved. Built with passion for explorers.</p>
+    </footer>
+
+    <script>
+        // --- Mobile Menu Drawer Toggle ---
+        const menuToggle = document.querySelector('.menu-toggle');
+        const navLinks = document.querySelector('.nav-links');
+        const backdrop = document.querySelector('.nav-backdrop');
+
+        function toggleMenu() {
+            navLinks.classList.toggle('active');
+            backdrop.classList.toggle('active');
+            const icon = menuToggle.querySelector('i');
+            icon.className = navLinks.classList.contains('active') ? 'fa-solid fa-xmark' : 'fa-solid fa-bars';
+        }
+
+        menuToggle.addEventListener('click', toggleMenu);
+        backdrop.addEventListener('click', toggleMenu);
+
+        document.querySelectorAll('.nav-links a').forEach(item => {
+            item.addEventListener('click', () => {
+                if (navLinks.classList.contains('active')) toggleMenu();
+            });
+        });
+
+        // --- Pricing and Dynamic Estimator logic ---
+        const destSelect = document.getElementById('dest-select');
+        const guestInput = document.getElementById('guest-count');
+        const arrivalDate = document.getElementById('arrival-date');
+        const leavingDate = document.getElementById('leaving-date');
+
+        // Upgrades inputs
+        const upgHotel = document.getElementById('upgrade-hotel');
+        const upgGuide = document.getElementById('upgrade-guide');
+        const upgMeals = document.getElementById('upgrade-meals');
+        const upgInsurance = document.getElementById('upgrade-insurance');
+
+        // Summary elements
+        const summaryDestName = document.getElementById('summary-dest-name');
+        const summaryDestBase = document.getElementById('summary-dest-base');
+        const summaryGuests = document.getElementById('summary-guests');
+        const summaryExtrasRow = document.getElementById('summary-extras-row');
+        const summaryExtrasTotal = document.getElementById('summary-extras-total');
+        const grandTotalText = document.getElementById('estimated-grand-total');
+
+        function recalculateInvoice() {
+            const destValue = destSelect.value;
+            
+            if (destValue === "none") {
+                summaryDestName.textContent = "None Selected";
+                summaryDestBase.textContent = "$0";
+                summaryGuests.textContent = "1 Traveler";
+                grandTotalText.textContent = "$0";
+                summaryExtrasRow.style.display = "none";
+                return;
+            }
+
+            const basePrice = parseInt(destValue, 10);
+            const selectedOption = destSelect.options[destSelect.selectedIndex];
+            const destName = selectedOption.getAttribute('data-name');
+            const guests = Math.max(1, parseInt(guestInput.value, 10) || 1);
+
+            // Update destination and guest summary text
+            summaryDestName.textContent = destName;
+            summaryDestBase.textContent = `$${basePrice.toLocaleString()}`;
+            summaryGuests.textContent = `${guests} ${guests === 1 ? 'Traveler' : 'Travelers'}`;
+
+            // Calculate upgrade values
+            let extrasCost = 0;
+
+            // Checked item class indicators & price accumulation
+            if (upgHotel.checked) {
+                document.getElementById('card-upgrade-hotel').classList.add('selected');
+                extrasCost += parseInt(upgHotel.value, 10) * guests; // Per guest
+            } else {
+                document.getElementById('card-upgrade-hotel').classList.remove('selected');
+            }
+
+            if (upgGuide.checked) {
+                document.getElementById('card-upgrade-guide').classList.add('selected');
+                extrasCost += parseInt(upgGuide.value, 10); // Flat fee
+            } else {
+                document.getElementById('card-upgrade-guide').classList.remove('selected');
+            }
+
+            if (upgMeals.checked) {
+                document.getElementById('card-upgrade-meals').classList.add('selected');
+                extrasCost += parseInt(upgMeals.value, 10) * guests; // Per guest
+            } else {
+                document.getElementById('card-upgrade-meals').classList.remove('selected');
+            }
+
+            if (upgInsurance.checked) {
+                document.getElementById('card-upgrade-insurance').classList.add('selected');
+                extrasCost += parseInt(upgInsurance.value, 10); // Flat fee
+            } else {
+                document.getElementById('card-upgrade-insurance').classList.remove('selected');
+            }
+
+            // Display upgrades row in summary panel if any checked
+            if (extrasCost > 0) {
+                summaryExtrasRow.style.display = "flex";
+                summaryExtrasTotal.textContent = `+$${extrasCost.toLocaleString()}`;
+            } else {
+                summaryExtrasRow.style.display = "none";
+            }
+
+            // Absolute total estimate
+            const finalTotal = (basePrice * guests) + extrasCost;
+            grandTotalText.textContent = `$${finalTotal.toLocaleString()}`;
+        }
+
+        // Attach event listeners to trigger instant invoice recalculation
+        destSelect.addEventListener('change', recalculateInvoice);
+        guestInput.addEventListener('input', recalculateInvoice);
+        upgHotel.addEventListener('change', recalculateInvoice);
+        upgGuide.addEventListener('change', recalculateInvoice);
+        upgMeals.addEventListener('change', recalculateInvoice);
+        upgInsurance.addEventListener('change', recalculateInvoice);
+
+        // --- Date Logic Verification & Booking submission ---
+        const bookingForm = document.getElementById('detailed-booking-form');
+
+        bookingForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            const destVal = destSelect.value;
+            if (destVal === "none") {
+                alert("Please select a tour destination package first!");
+                return;
+            }
+
+            const checkIn = new Date(arrivalDate.value);
+            const checkOut = new Date(leavingDate.value);
+
+            if (checkIn > checkOut) {
+                alert("Error: Leaving date cannot be scheduled before your arrival date!");
+                return;
+            }
+
+            const chosenName = destSelect.options[destSelect.selectedIndex].getAttribute('data-name');
+            const totalToPay = grandTotalText.textContent;
+            const leadTraveler = document.getElementById('lead-name').value;
+
+            alert(`Thank you, ${leadTraveler}! Your booking reservation for ${chosenName} has been initialized successfully. Calculated total: ${totalToPay}. Check your email to finalize secured payment.`);
+            
+            bookingForm.reset();
+            // Reset upgrade select states
+            document.querySelectorAll('.upgrade-card').forEach(el => el.classList.remove('selected'));
+            recalculateInvoice();
+        });
+    </script>
+</body>
+</html>

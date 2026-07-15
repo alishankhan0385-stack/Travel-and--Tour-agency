@@ -1,0 +1,883 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Explore Destinations | Roamify</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* --- Google Fonts & Reset --- */
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+            text-decoration: none;
+            list-style: none;
+            scroll-behavior: smooth;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        :root {
+            --primary: #ff4a5a;
+            --dark: #1a1a1a;
+            --light: #fdfdfd;
+            --bg-alt: #f4f6f9;
+            --grey: #6c757d;
+            --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        body {
+            background-color: var(--bg-alt);
+            color: var(--dark);
+            overflow-x: hidden;
+        }
+
+        /* --- Header / Navbar --- */
+        header {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            padding: 15px 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 30px rgba(0,0,0,0.03);
+            z-index: 1000;
+        }
+
+        header .logo {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--dark);
+            letter-spacing: -0.5px;
+        }
+
+        header .logo .dot {
+            color: var(--primary);
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: var(--dark);
+            font-weight: 600;
+            margin-left: 25px;
+            font-size: 0.95rem;
+            position: relative;
+            padding: 5px 0;
+            transition: var(--transition);
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: 0; left: 0;
+            width: 0; height: 2px;
+            background: var(--primary);
+            transition: var(--transition);
+        }
+
+        .nav-links a:hover::after, .nav-links a.active::after {
+            width: 100%;
+        }
+
+        .nav-links a:hover, .nav-links a.active {
+            color: var(--primary);
+        }
+
+        .menu-toggle {
+            font-size: 22px;
+            cursor: pointer;
+            display: none;
+            z-index: 1100;
+            width: 40px;
+            height: 40px;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: var(--bg-alt);
+            transition: var(--transition);
+        }
+
+        /* --- Destinations Hero --- */
+        .dest-hero {
+            height: 45vh;
+            background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), 
+                        url('https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&w=1500&q=80') no-repeat center center/cover;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            color: #fff;
+            padding: 100px 24px 0;
+        }
+
+        .dest-hero h1 {
+            font-size: 2.8rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            letter-spacing: -1px;
+        }
+
+        .dest-hero p {
+            font-size: 1.1rem;
+            font-weight: 300;
+            opacity: 0.9;
+        }
+
+        /* --- Filter & Search Bar --- */
+        .search-filter-container {
+            max-width: 1100px;
+            margin: -40px auto 40px;
+            padding: 0 20px;
+            position: relative;
+            z-index: 10;
+        }
+
+        .filter-card {
+            background: #fff;
+            padding: 20px;
+            border-radius: 16px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.06);
+            display: grid;
+            grid-template-columns: 2fr 1.2fr 1.2fr;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .filter-group {
+            display: flex;
+            align-items: center;
+            background: var(--bg-alt);
+            padding: 12px 16px;
+            border-radius: 10px;
+            border: 1.5px solid transparent;
+            transition: var(--transition);
+        }
+
+        .filter-group:focus-within {
+            border-color: var(--primary);
+            background: #fff;
+            box-shadow: 0 0 0 4px rgba(255, 74, 90, 0.1);
+        }
+
+        .filter-group i {
+            color: var(--primary);
+            margin-right: 12px;
+            font-size: 1.1rem;
+        }
+
+        .filter-group input, .filter-group select {
+            border: none;
+            background: transparent;
+            outline: none;
+            width: 100%;
+            font-size: 0.95rem;
+            color: var(--dark);
+        }
+
+        .filter-group select {
+            cursor: pointer;
+        }
+
+        /* --- Destinations Grid --- */
+        .destinations-section {
+            max-width: 1200px;
+            margin: 0 auto 80px;
+            padding: 0 20px;
+        }
+
+        .grid-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .grid-header h2 {
+            font-size: 1.6rem;
+            font-weight: 700;
+        }
+
+        .grid-header span {
+            color: var(--grey);
+            font-size: 0.9rem;
+        }
+
+        .dest-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 30px;
+        }
+
+        .dest-card {
+            background: #fff;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.03);
+            border: 1px solid #f0f0f0;
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .dest-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.08);
+        }
+
+        .img-container {
+            position: relative;
+            height: 250px;
+            overflow: hidden;
+        }
+
+        .img-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+        .dest-card:hover .img-container img {
+            transform: scale(1.08);
+        }
+
+        .badge {
+            position: absolute;
+            top: 15px; left: 15px;
+            background: rgba(26, 26, 26, 0.85);
+            backdrop-filter: blur(5px);
+            color: #fff;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        .favorite-btn {
+            position: absolute;
+            top: 15px; right: 15px;
+            width: 36px; height: 36px;
+            background: #fff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            color: var(--grey);
+            transition: var(--transition);
+            border: none;
+            outline: none;
+        }
+
+        .favorite-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .favorite-btn.active {
+            color: var(--primary);
+        }
+
+        .dest-body {
+            padding: 24px;
+        }
+
+        .dest-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            font-size: 0.85rem;
+            color: var(--grey);
+        }
+
+        .dest-meta span i {
+            color: var(--primary);
+            margin-right: 4px;
+        }
+
+        .rating i {
+            color: #ffa801;
+            margin-right: 2px;
+        }
+
+        .dest-body h3 {
+            font-size: 1.35rem;
+            color: var(--dark);
+            margin-bottom: 8px;
+            font-weight: 700;
+        }
+
+        .dest-body p {
+            color: var(--grey);
+            font-size: 0.9rem;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .dest-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid #f5f5f5;
+            padding-top: 18px;
+        }
+
+        .price-tag {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .price-tag span {
+            font-size: 0.85rem;
+            color: var(--grey);
+            font-weight: 400;
+        }
+
+        .btn-sm {
+            padding: 10px 20px;
+            background: var(--dark);
+            color: #fff;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            transition: var(--transition);
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-sm:hover {
+            background: var(--primary);
+            box-shadow: 0 4px 15px rgba(255, 74, 90, 0.3);
+        }
+
+        /* --- Quick View Modal --- */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(5px);
+            z-index: 2000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: var(--transition);
+            padding: 20px;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            background: #fff;
+            max-width: 650px;
+            width: 100%;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.15);
+            position: relative;
+            transform: scale(0.9);
+            transition: var(--transition);
+        }
+
+        .modal-overlay.active .modal-content {
+            transform: scale(1);
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 15px; right: 15px;
+            width: 36px; height: 36px;
+            background: #fff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            border: none;
+            font-size: 1.1rem;
+            color: var(--dark);
+            z-index: 10;
+        }
+
+        .modal-img {
+            height: 250px;
+            width: 100%;
+            object-fit: cover;
+        }
+
+        .modal-body {
+            padding: 30px;
+        }
+
+        .modal-body h3 {
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+        }
+
+        .modal-itinerary {
+            margin: 20px 0;
+            background: var(--bg-alt);
+            padding: 15px;
+            border-radius: 12px;
+        }
+
+        .modal-itinerary h4 {
+            font-size: 0.95rem;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .modal-itinerary li {
+            font-size: 0.85rem;
+            color: var(--grey);
+            margin-bottom: 6px;
+            position: relative;
+            padding-left: 15px;
+        }
+
+        .modal-itinerary li::before {
+            content: '•';
+            color: var(--primary);
+            position: absolute;
+            left: 0;
+        }
+
+        .modal-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 25px;
+        }
+
+        /* --- Footer --- */
+        footer {
+            background: var(--dark);
+            color: rgba(255,255,255,0.7);
+            text-align: center;
+            padding: 30px 20px;
+            font-size: 0.85rem;
+            border-top: 1px solid #2a2a2a;
+        }
+
+        /* --- Mobile Responsive drawer styling --- */
+        .nav-backdrop {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.4);
+            opacity: 0;
+            visibility: hidden;
+            z-index: 998;
+            transition: var(--transition);
+        }
+
+        .nav-backdrop.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* --- Responsive Queries --- */
+        @media (max-width: 768px) {
+            .menu-toggle {
+                display: flex;
+            }
+
+            .nav-links {
+                position: fixed;
+                top: 0; 
+                right: -100%;
+                width: 280px;
+                height: 100vh;
+                background: #fff;
+                flex-direction: column;
+                align-items: flex-start;
+                padding: 100px 40px;
+                box-shadow: -10px 0 30px rgba(0,0,0,0.05);
+                z-index: 999;
+                transition: right 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+            }
+
+            .nav-links.active {
+                right: 0;
+            }
+
+            .nav-links li {
+                width: 100%;
+                margin-bottom: 25px;
+            }
+
+            .nav-links a {
+                margin-left: 0;
+                font-size: 1.15rem;
+                display: block;
+                width: 100%;
+            }
+
+            .filter-card {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+
+            .dest-hero h1 {
+                font-size: 2.2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo">Roamify<span class="dot">.</span></div>
+        <nav>
+            <ul class="nav-links">
+                <li><a href="index.html#home">Home</a></li>
+                <li><a href="#" class="active">Destinations</a></li>
+                <li><a href="index.html#book">Book Trip</a></li>
+                <!-- <li><a href="index.html#reviews">Reviews</a></li> -->
+                <li><a href="index.html#contact">Contact</a></li>
+            </ul>
+        </nav>
+        <div class="menu-toggle"><i class="fa-solid fa-bars"></i></div>
+    </header>
+
+    <div class="nav-backdrop"></div>
+
+    <section class="dest-hero">
+        <h1>Discover Your Next Adventure</h1>
+        <p>Browse our curated escapes designed to inspire and delight.</p>
+    </section>
+
+    <!-- Search & Filter Area -->
+    <div class="search-filter-container">
+        <div class="filter-card">
+            <div class="filter-group">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" id="search-input" placeholder="Search by city or country...">
+            </div>
+            <div class="filter-group">
+                <i class="fa-solid fa-globe"></i>
+                <select id="region-select">
+                    <option value="all">All Regions</option>
+                    <option value="asia">Asia</option>
+                    <option value="europe">Europe</option>
+                    <option value="caribbean">Caribbean</option>
+                    <option value="africa">Africa</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <i class="fa-solid fa-dollar-sign"></i>
+                <select id="price-select">
+                    <option value="all">Any Price</option>
+                    <option value="under-1000">Under $1,000</option>
+                    <option value="1000-1500">$1,000 - $1,500</option>
+                    <option value="above-1500">Above $1,500</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Grid Section -->
+    <section class="destinations-section">
+        <div class="grid-header">
+            <h2>Available Packages</h2>
+            <span id="results-count">Showing 6 destinations</span>
+        </div>
+
+        <div class="dest-grid" id="destination-grid">
+            <!-- Dynamic/Static Cards are defined here -->
+            <div class="dest-card" data-region="caribbean" data-price="1200" data-tags="beach paradise tropical">
+                <div class="img-container">
+                    <span class="badge">Trending</span>
+                    <button class="favorite-btn" aria-label="Add to favorites"><i class="fa-solid fa-heart"></i></button>
+                    <img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=500&q=80" alt="Maldives">
+                </div>
+                <div class="dest-body">
+                    <div class="dest-meta">
+                        <span><i class="fa-solid fa-clock"></i> 7 Days / 6 Nights</span>
+                        <div class="rating"><i class="fa-solid fa-star"></i> 4.9</div>
+                    </div>
+                    <h3>Maldives</h3>
+                    <p>Experience pure tropical bliss in private overwater villas floating atop vibrant turquoise lagoons.</p>
+                    <div class="dest-footer">
+                        <div class="price-tag">$1,200<span>/ person</span></div>
+                        <button class="btn-sm quick-view" data-dest="Maldives" data-price="$1,200" data-img="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=80" data-desc="Unwind in an exclusive overwater villa. Dive among colorful manta rays, dine in glass underwater restaurants, and relax with private spa rituals on white powder sands.">Quick View</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dest-card" data-region="asia" data-price="1500" data-tags="japan cherry blossom temples">
+                <div class="img-container">
+                    <span class="badge">Cultural</span>
+                    <button class="favorite-btn" aria-label="Add to favorites"><i class="fa-solid fa-heart"></i></button>
+                    <img src="https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?auto=format&fit=crop&w=500&q=80" alt="Kyoto">
+                </div>
+                <div class="dest-body">
+                    <div class="dest-meta">
+                        <span><i class="fa-solid fa-clock"></i> 8 Days / 7 Nights</span>
+                        <div class="rating"><i class="fa-solid fa-star"></i> 4.8</div>
+                    </div>
+                    <h3>Kyoto, Japan</h3>
+                    <p>Wander through golden shrines, tranquil bamboo forests, and traditional wooden Machiya districts.</p>
+                    <div class="dest-footer">
+                        <div class="price-tag">$1,500<span>/ person</span></div>
+                        <button class="btn-sm quick-view" data-dest="Kyoto, Japan" data-price="$1,500" data-img="https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?auto=format&fit=crop&w=800&q=80" data-desc="Step back into history. This package features curated temple guides, access to hidden tea houses, and scenic excursions into Arashiyama Bamboo Grove.">Quick View</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dest-card" data-region="asia" data-price="850" data-tags="bali beaches exotic mountains">
+                <div class="img-container">
+                    <span class="badge">Best Value</span>
+                    <button class="favorite-btn" aria-label="Add to favorites"><i class="fa-solid fa-heart"></i></button>
+                    <img src="https://images.unsplash.com/photo-1537996194471-e657df975ab4?auto=format&fit=crop&w=500&q=80" alt="Bali">
+                </div>
+                <div class="dest-body">
+                    <div class="dest-meta">
+                        <span><i class="fa-solid fa-clock"></i> 6 Days / 5 Nights</span>
+                        <div class="rating"><i class="fa-solid fa-star"></i> 4.7</div>
+                    </div>
+                    <h3>Bali, Indonesia</h3>
+                    <p>Discover an island of steep volcanic peaks, terraced rice paddies, and magical spiritual temple retreats.</p>
+                    <div class="dest-footer">
+                        <div class="price-tag">$850<span>/ person</span></div>
+                        <button class="btn-sm quick-view" data-dest="Bali, Indonesia" data-price="$850" data-img="https://images.unsplash.com/photo-1537996194471-e657df975ab4?auto=format&fit=crop&w=800&q=80" data-desc="An escape built for adventure and wellness. Includes guided sunrise hikes up Mount Batur, surf lessons in Canggu, and private villa stays in peaceful Ubud.">Quick View</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dest-card" data-region="europe" data-price="1800" data-tags="santorini greece sunset coast">
+                <div class="img-container">
+                    <span class="badge">Luxury</span>
+                    <button class="favorite-btn" aria-label="Add to favorites"><i class="fa-solid fa-heart"></i></button>
+                    <img src="https://images.unsplash.com/photo-1570077188670-e3a8d69ac5ff?auto=format&fit=crop&w=500&q=80" alt="Santorini">
+                </div>
+                <div class="dest-body">
+                    <div class="dest-meta">
+                        <span><i class="fa-solid fa-clock"></i> 7 Days / 6 Nights</span>
+                        <div class="rating"><i class="fa-solid fa-star"></i> 4.9</div>
+                    </div>
+                    <h3>Santorini, Greece</h3>
+                    <p>Gaze over steep volcanic cliffs and caldera water viewpoints from pristine whitewashed cliff villages.</p>
+                    <div class="dest-footer">
+                        <div class="price-tag">$1,800<span>/ person</span></div>
+                        <button class="btn-sm quick-view" data-dest="Santorini, Greece" data-price="$1,800" data-img="https://images.unsplash.com/photo-1570077188670-e3a8d69ac5ff?auto=format&fit=crop&w=800&q=80" data-desc="Indulge in Mediterranean culinary treats. Includes sunset catamaran cruises, private wine tastings in traditional vineyards, and luxury caldera-view stays.">Quick View</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dest-card" data-region="europe" data-price="1400" data-tags="amalfi coast italy cliffs ocean romantic">
+                <div class="img-container">
+                    <span class="badge">Romantic</span>
+                    <button class="favorite-btn" aria-label="Add to favorites"><i class="fa-solid fa-heart"></i></button>
+                    <img src="https://images.unsplash.com/photo-1533105079780-92b9be482077?auto=format&fit=crop&w=500&q=80" alt="Amalfi Coast">
+                </div>
+                <div class="dest-body">
+                    <div class="dest-meta">
+                        <span><i class="fa-solid fa-clock"></i> 6 Days / 5 Nights</span>
+                        <div class="rating"><i class="fa-solid fa-star"></i> 4.6</div>
+                    </div>
+                    <h3>Amalfi Coast, Italy</h3>
+                    <p>Drive along winding scenic cliff-side highways overlooking beautiful ocean bays and pastel fishing towns.</p>
+                    <div class="dest-footer">
+                        <div class="price-tag">$1,400<span>/ person</span></div>
+                        <button class="btn-sm quick-view" data-dest="Amalfi Coast, Italy" data-price="$1,400" data-img="https://images.unsplash.com/photo-1533105079780-92b9be482077?auto=format&fit=crop&w=800&q=80" data-desc="Immerse yourself in La Dolce Vita. Stay in historic coastal villas, learn authentic hand-rolled pasta making from a local chef, and cruise to Capri on a private boat.">Quick View</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dest-card" data-region="africa" data-price="2200" data-tags="serengeti tanzania safari wildlife nature">
+                <div class="img-container">
+                    <span class="badge">Adventure</span>
+                    <button class="favorite-btn" aria-label="Add to favorites"><i class="fa-solid fa-heart"></i></button>
+                    <img src="https://images.unsplash.com/photo-1516426122078-c23e76319801?auto=format&fit=crop&w=500&q=80" alt="Serengeti">
+                </div>
+                <div class="dest-body">
+                    <div class="dest-meta">
+                        <span><i class="fa-solid fa-clock"></i> 9 Days / 8 Nights</span>
+                        <div class="rating"><i class="fa-solid fa-star"></i> 4.9</div>
+                    </div>
+                    <h3>Serengeti, Tanzania</h3>
+                    <p>Embark on thrilling game drives to witness the majestic Big Five and spectacular annual wildlife migrations.</p>
+                    <div class="dest-footer">
+                        <div class="price-tag">$2,200<span>/ person</span></div>
+                        <button class="btn-sm quick-view" data-dest="Serengeti, Tanzania" data-price="$2,200" data-img="https://images.unsplash.com/photo-1516426122078-c23e76319801?auto=format&fit=crop&w=800&q=80" data-desc="Live the safari dream. Travel deep into national parks with expert trackers, sleep in luxury canvas lodges, and take an optional hot-air balloon flight over the savanna.">Quick View</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Quick View Modal Container -->
+    <div class="modal-overlay" id="quickview-modal">
+        <div class="modal-content">
+            <button class="close-modal" aria-label="Close modal"><i class="fa-solid fa-xmark"></i></button>
+            <img src="" alt="" id="modal-img" class="modal-img">
+            <div class="modal-body">
+                <h3 id="modal-title">Destination</h3>
+                <p id="modal-description">Detailed description placeholder.</p>
+                
+                <div class="modal-itinerary">
+                    <h4>What's Included</h4>
+                    <ul>
+                        <li>Handpicked boutique 4 & 5-star accommodations</li>
+                        <li>Daily artisanal breakfast and curated dinners</li>
+                        <li>Private, fully customized ground transport & transfers</li>
+                        <li>Guided tours by certified local historians</li>
+                    </ul>
+                </div>
+
+                <div class="modal-actions">
+                    <div class="price-tag" id="modal-price">$0</div>
+                    <button class="btn" id="modal-book-btn">Proceed to Book</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2026 Roamify. All Rights Reserved. Built with passion for explorers.</p>
+    </footer>
+
+    <script>
+        // --- Mobile Menu Toggle ---
+        const menuToggle = document.querySelector('.menu-toggle');
+        const navLinks = document.querySelector('.nav-links');
+        const backdrop = document.querySelector('.nav-backdrop');
+
+        function toggleMenu() {
+            navLinks.classList.toggle('active');
+            backdrop.classList.toggle('active');
+            const icon = menuToggle.querySelector('i');
+            icon.className = navLinks.classList.contains('active') ? 'fa-solid fa-xmark' : 'fa-solid fa-bars';
+        }
+
+        menuToggle.addEventListener('click', toggleMenu);
+        backdrop.addEventListener('click', toggleMenu);
+
+        // Close nav when clicking a link
+        document.querySelectorAll('.nav-links a').forEach(item => {
+            item.addEventListener('click', () => {
+                if (navLinks.classList.contains('active')) toggleMenu();
+            });
+        });
+
+        // --- Live Card Favorite Toggles ---
+        document.querySelectorAll('.favorite-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                btn.classList.toggle('active');
+            });
+        });
+
+        // --- Filter and Search Logic ---
+        const searchInput = document.getElementById('search-input');
+        const regionSelect = document.getElementById('region-select');
+        const priceSelect = document.getElementById('price-select');
+        const cards = document.querySelectorAll('.dest-card');
+        const countSpan = document.getElementById('results-count');
+
+        function filterDestinations() {
+            const query = searchInput.value.toLowerCase().trim();
+            const region = regionSelect.value;
+            const priceRange = priceSelect.value;
+            let visibleCount = 0;
+
+            cards.forEach(card => {
+                const title = card.querySelector('h3').textContent.toLowerCase();
+                const desc = card.querySelector('.dest-body p').textContent.toLowerCase();
+                const tags = card.getAttribute('data-tags').toLowerCase();
+                const cardRegion = card.getAttribute('data-region');
+                const cardPrice = parseInt(card.getAttribute('data-price'), 10);
+
+                // Matches search
+                const matchesSearch = title.includes(query) || desc.includes(query) || tags.includes(query);
+                
+                // Matches Region
+                const matchesRegion = (region === 'all' || cardRegion === region);
+
+                // Matches Price Dropdown
+                let matchesPrice = false;
+                if (priceRange === 'all') {
+                    matchesPrice = true;
+                } else if (priceRange === 'under-1000') {
+                    matchesPrice = cardPrice < 1000;
+                } else if (priceRange === '1000-1500') {
+                    matchesPrice = (cardPrice >= 1000 && cardPrice <= 1500);
+                } else if (priceRange === 'above-1500') {
+                    matchesPrice = cardPrice > 1500;
+                }
+
+                if (matchesSearch && matchesRegion && matchesPrice) {
+                    card.style.display = 'block';
+                    visibleCount++;
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+
+            countSpan.textContent = `Showing ${visibleCount} destination${visibleCount === 1 ? '' : 's'}`;
+        }
+
+        searchInput.addEventListener('input', filterDestinations);
+        regionSelect.addEventListener('change', filterDestinations);
+        priceSelect.addEventListener('change', filterDestinations);
+
+        // --- Quick View Modal Functionality ---
+        const modal = document.getElementById('quickview-modal');
+        const modalImg = document.getElementById('modal-img');
+        const modalTitle = document.getElementById('modal-title');
+        const modalDesc = document.getElementById('modal-description');
+        const modalPrice = document.getElementById('modal-price');
+        const closeModal = document.querySelector('.close-modal');
+        const modalBookBtn = document.getElementById('modal-book-btn');
+
+        document.querySelectorAll('.quick-view').forEach(btn => {
+            btn.addEventListener('click', () => {
+                modalImg.src = btn.getAttribute('data-img');
+                modalImg.alt = btn.getAttribute('data-dest');
+                modalTitle.textContent = btn.getAttribute('data-dest');
+                modalDesc.textContent = btn.getAttribute('data-desc');
+                modalPrice.innerHTML = `${btn.getAttribute('data-price')}<span>/ person</span>`;
+                
+                modal.classList.add('active');
+            });
+        });
+
+        function closeQuickView() {
+            modal.classList.remove('active');
+        }
+
+        closeModal.addEventListener('click', closeQuickView);
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) closeQuickView();
+        });
+
+        modalBookBtn.addEventListener('click', () => {
+            alert(`Redirecting you to complete booking for ${modalTitle.textContent}!`);
+            closeQuickView();
+        });
+    </script>
+</body>
+</html>
